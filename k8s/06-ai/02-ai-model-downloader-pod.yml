@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ai-model-downloader-pod
+  namespace: medusa
+  labels:
+    name: ai-model-downloader-pod
+    app: ai
+spec:
+  containers:
+    - name: ai-model-downloader-pod
+      image: undercry927/medusa-ai-model-downloader:latest
+      imagePullPolicy: Always
+      resources:
+        limits:
+          memory: "1Gi"
+          cpu: "2000m"
+      volumeMounts:
+        - name: ai-storage
+          mountPath: /models
+  restartPolicy: OnFailure
+  volumes:
+    - name: ai-storage
+      persistentVolumeClaim:
+        claimName: ai-pvc

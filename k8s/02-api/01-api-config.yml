@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-config
+  namespace: medusa
+  labels:
+    app: api
+data:
+  DATABASE_URL: postgres://postgres:postgres@postgres-service.medusa.svc.cluster.local:55432/postgres
+  PORT: "3000"
+

@@ -1,0 +1,44 @@
+services:
+  web:
+    build: 
+      context: apps/web
+      dockerfile: Dockerfile.production
+    image: undercry927/medusa-web:latest
+  
+  api:
+    build: 
+      context: apps/api
+      dockerfile: Dockerfile.production
+    image: undercry927/medusa-api:latest
+
+  nginx:
+    build: 
+      context: apps/nginx
+      dockerfile: Dockerfile.production
+    image: undercry927/medusa-nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+
+  postgres:
+    image: postgres:16-alpine
+    env_file: .env.production
+
+  backup-pg:
+    build: 
+      context: apps/backup-pg
+      dockerfile: Dockerfile
+    image: undercry927/medusa-backup-pg:latest
+    env_file: .env.production
+
+  ai-model-downloader:
+    build: 
+      context: apps/ai/model-downloader
+      dockerfile: Dockerfile
+    image: undercry927/medusa-ai-model-downloader:latest
+
+  ai-server:
+    build: 
+      context: apps/ai/server
+      dockerfile: Dockerfile
+    image: undercry927/medusa-ai-server:latest

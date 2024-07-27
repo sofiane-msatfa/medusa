@@ -1,0 +1,17 @@
+meta {
+  name: create user
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:80/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "false": "galse"
+  }
+}

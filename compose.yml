@@ -1,0 +1,116 @@
+services:
+  web:
+    build:
+      context: apps/web
+      dockerfile: Dockerfile
+    image: undercry927/medusa-web-local:latest
+    container_name: medusa-web
+    volumes:
+      - ./apps/web/src:/app/src
+    networks:
+      - medusa-network
+
+  api:
+    build:
+      context: apps/api
+      dockerfile: Dockerfile
+    image: undercry927/medusa-api-local:latest
+    container_name: medusa-api
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - medusa-network
+
+  nginx:
+    build:
+      context: apps/nginx
+      dockerfile: Dockerfile
+    image: undercry927/medusa-nginx-local:latest
+    container_name: medusa-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+      - api
+    networks:
+      - medusa-network
+      - host
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: medusa-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medusa-network
+
+  backup-pg:
+    build:
+      context: apps/backup-pg
+      dockerfile: Dockerfile
+    image: undercry927/medusa-backup-pg-local:latest
+    container_name: medusa-backup-pg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./assets/backups:/backups
+    networks:
+      - medusa-network
+
+  ai-model-downloader:
+    build:
+      context: apps/ai/model-downloader
+      dockerfile: Dockerfile
+    image: undercry927/medusa-ai-model-downloader-local:latest
+    container_name: medusa-ai-model-downloader
+    volumes:
+      - ./assets/models:/models
+    networks:
+      - medusa-network
+
+  ai-server:
+    build:
+      context: apps/ai/server
+      dockerfile: Dockerfile
+    image: undercry927/medusa-ai-server-local:latest
+    container_name: medusa-ai-server
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./assets/models:/models
+      - ./apps/ai/server/app.py:/app/app.py
+    depends_on:
+      ai-model-downloader:
+        condition: service_completed_successfully
+    networks:
+      - medusa-network
+      - host # TODO à changer
+
+# TODO créer des tests pour les services
+
+volumes:
+  postgres_data:
+
+networks:
+  medusa-network:
+  host:

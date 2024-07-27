@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-server
+  namespace: medusa
+  labels:
+    app: ai
+spec:
+  selector:
+    matchLabels:
+      app: ai-server
+  template:
+    metadata:
+      labels:
+        app: ai-server
+    spec:
+      containers:
+        - name: ai-server
+          image: undercry927/medusa-ai-server:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 4000
+          volumeMounts:
+            - name: ai-storage
+              mountPath: /models
+      volumes:
+        - name: ai-storage
+          persistentVolumeClaim:
+            claimName: ai-pvc
