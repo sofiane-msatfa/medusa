@@ -16,6 +16,9 @@ services:
       dockerfile: Dockerfile
     image: undercry927/medusa-api-local:latest
     container_name: medusa-api
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      PORT: 3333
     volumes:
       - ./apps/api:/app
       - /app/node_modules

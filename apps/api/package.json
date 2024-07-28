@@ -7,7 +7,7 @@
     "build": "node esbuild.mjs",
     "start": "node dist/main.cjs",
     "production": "pnpm run db:deploy && pnpm run start",
-    "dev": "pnpm run db:migrate && tsx watch --env-file=.env src/main.ts",
+    "dev": "pnpm run db:migrate && tsx watch src/main.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy"

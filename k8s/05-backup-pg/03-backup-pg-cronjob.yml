@@ -2,6 +2,9 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: backup-pg-cronjob
+  namespace: medusa
+  labels:
+    app: backup-pg
 spec:
   schedule: "0 * * * *" # Toutes les heures
   jobTemplate:
